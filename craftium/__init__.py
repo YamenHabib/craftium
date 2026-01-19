@@ -72,7 +72,7 @@ if is_minetest_build_dir(os.getcwd()):
     root_path = os.getcwd()
 else:  # in this case, this module might be running as an installed python package
     # get the path location of the parent of this module
-    root_path = os.path.dirname(__file__)
+    root_path = os.path.dirname(os.path.dirname(__file__))
 
 register(
     id="Craftium/Room-v0",
@@ -198,6 +198,35 @@ register(
         obs_width=64,
         obs_height=64,
         max_timesteps=4000,
+        init_frames=200,
+        _minetest_conf=dict(
+            give_initial_stuff=True,
+            initial_stuff="default:sword_steel",
+        ),
+        _voxel_obs_available=True,
+    )
+)
+
+register(
+    id="Craftium/SpiderAttackEasy-v0",
+    entry_point="craftium.craftium_env:CraftiumEnv",
+    additional_wrappers=[
+        WrapperSpec(
+            name="DiscreteActionWrapper",
+            entry_point="craftium.wrappers:DiscreteActionWrapper",
+            kwargs=dict(
+                actions=["forward", "left", "right", "jump", "dig", "mouse x+", "mouse x-",
+                         "mouse y+", "mouse y-"],
+                mouse_mov=0.5,
+            ),
+        )
+    ],
+    # kwargs
+    kwargs=dict(
+        env_dir=os.path.join(root_path, "craftium-envs/spider-attack-easy"),
+        obs_width=64,
+        obs_height=64,
+        max_timesteps=2000,
         init_frames=200,
         _minetest_conf=dict(
             give_initial_stuff=True,

@@ -98,13 +98,13 @@ inline int syncClientInit() {
     printf("Creating semaphore with name '%s'\n", cli_sem_name_B);
     */
 
-    if ((cli_sem_A = sem_open(cli_sem_name_A, 0)) == SEM_FAILED) {
-        perror("[SyncClient] Failed  to open semaphore A");
+    if ((cli_sem_A = sem_open(cli_sem_name_A, O_CREAT, 0644, 0)) == SEM_FAILED) {
+        perror("[SyncClient] Failed to open semaphore A");
         exit(EXIT_FAILURE);
     }
 
-    if ((cli_sem_B = sem_open(cli_sem_name_B, 0)) == SEM_FAILED) {
-        perror("[SyncClient] Failed  to open semaphore B");
+    if ((cli_sem_B = sem_open(cli_sem_name_B, O_CREAT, 0644, 0)) == SEM_FAILED) {
+        perror("[SyncClient] Failed to open semaphore B");
         exit(EXIT_FAILURE);
     }
 
