@@ -696,9 +696,18 @@ void Client::connect(const Address &address, const std::string &address_name)
 
 void Client::step(float dtime)
 {
-    syncClientStep();
+	syncClientStep();
 
-	dtime -= m_craftium_lag;
+	const float fixed_sync_dtime = g_settings->getFloat("craftium_fixed_sync_dtime");
+	const bool use_fixed_sync_dtime =
+		g_settings->getBool("sync_env_mode") && fixed_sync_dtime > 0.0f;
+	if (use_fixed_sync_dtime) {
+		dtime = fixed_sync_dtime;
+	} else {
+		dtime -= m_craftium_lag;
+		if (dtime < 0.0f)
+			dtime = 0.0f;
+	}
 
 	// printf("client dtime: %f, LIM: %f\n", dtime, DTIME_LIMIT);
 	// Limit a bit

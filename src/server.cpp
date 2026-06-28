@@ -130,12 +130,16 @@ void *ServerThread::run()
 		framemarker.start();
 		ScopeProfiler spm(g_profiler, "Server::RunStep() (max)", SPT_MAX);
 
-                // Sync before computing t0, such that it does not affect the internal time (dtime)
-                syncServerStep();
+		// Sync before computing t0, such that it does not affect the internal time (dtime)
+		syncServerStep();
 
 		u64 t0 = porting::getTimeUs();
 
 		const auto step_settings = m_server->getStepSettings();
+		const float fixed_sync_dtime = g_settings->getFloat("craftium_fixed_sync_dtime");
+		const bool use_fixed_sync_dtime =
+			g_settings->getBool("sync_env_mode") && fixed_sync_dtime > 0.0f;
+		const float sim_dtime = use_fixed_sync_dtime ? fixed_sync_dtime : dtime;
 
 		try {
 			// see explanation inside
@@ -143,7 +147,7 @@ void *ServerThread::run()
 			if (dtime > step_settings.steplen + 0.001f)
 				m_server->yieldToOtherThreads(dtime);
 
-			m_server->AsyncRunStep(step_settings.pause ? 0.0f : dtime);
+			m_server->AsyncRunStep(step_settings.pause ? 0.0f : sim_dtime);
 
 			const float remaining_time = step_settings.steplen
 					- 1e-6f * (porting::getTimeUs() - t0);

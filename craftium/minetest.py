@@ -20,6 +20,13 @@ def is_inside_python_pkg():
     return "site-packages" in __file__
 
 
+def validate_fixed_sync_dtime(fixed_sync_dtime: float) -> float:
+    fixed_sync_dtime = float(fixed_sync_dtime)
+    if fixed_sync_dtime < 0:
+        raise ValueError("fixed_sync_dtime must be >= 0. Use 0.0 to disable fixed sync dtime.")
+    return fixed_sync_dtime
+
+
 class Minetest():
     def __init__(
             self,
@@ -45,10 +52,12 @@ class Minetest():
             frameskip: int = 1,
             rgb_frames: bool = True,
             sync_mode: bool = False,
+            fixed_sync_dtime: float = 0.0,
             fps_max: int = 200,
             pmul: int = 1,
     ):
         self.pipe_proc = pipe_proc
+        fixed_sync_dtime = validate_fixed_sync_dtime(fixed_sync_dtime)
 
 
         # create a dedicated directory for this run
@@ -103,6 +112,7 @@ class Minetest():
             remote_port=port,
 
             sync_env_mode=sync_mode,
+            craftium_fixed_sync_dtime=fixed_sync_dtime,
 
             # Adapt HUD size to display size, based on (1024, 600) default
             # hud_scaling=self.display_size[0] / 1024,
@@ -292,10 +302,12 @@ class MTServerOnly():
             pipe_proc: bool = True,
             mt_server_port: Optional[int] = None,
             sync_mode: bool = False,
+            fixed_sync_dtime: float = 0.0,
             fps_max: int = 200,
             pmul: int = 1,
     ):
         self.pipe_proc = pipe_proc
+        fixed_sync_dtime = validate_fixed_sync_dtime(fixed_sync_dtime)
 
         # create a dedicated directory for this run
         self.run_dir = f"minetest-srv--{uuid4()}"
@@ -329,6 +341,7 @@ class MTServerOnly():
             remote_port=self.server_port,
 
             sync_env_mode=sync_mode,
+            craftium_fixed_sync_dtime=fixed_sync_dtime,
 
             # Physics
             movement_acceleration_default=3.0*pmul,
@@ -504,10 +517,12 @@ class MTClientOnly():
             frameskip: int = 1,
             rgb_frames: bool = True,
             sync_mode: bool = False,
+            fixed_sync_dtime: float = 0.0,
             fps_max: int = 200,
             pmul: int = 1,
     ):
         self.pipe_proc = pipe_proc
+        fixed_sync_dtime = validate_fixed_sync_dtime(fixed_sync_dtime)
 
         # create a dedicated directory for this run
         self.run_dir = f"./minetest-{client_name}-{uuid4()}"
@@ -548,6 +563,7 @@ class MTClientOnly():
             remote_port=mt_server_port,
 
             sync_env_mode=sync_mode,
+            craftium_fixed_sync_dtime=fixed_sync_dtime,
 
             # Physics
             movement_acceleration_default=3.0*pmul,

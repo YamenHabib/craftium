@@ -493,6 +493,7 @@ void set_default_settings()
 	settings->setDefault("map_compression_level_net", "-1");
 	settings->setDefault("full_block_send_enable_min_time_from_building", "2.0");
 	settings->setDefault("dedicated_server_step", "0.09");
+	settings->setDefault("craftium_fixed_sync_dtime", "0.0");
 	settings->setDefault("active_block_mgmt_interval", "2.0");
 	settings->setDefault("abm_interval", "1.0");
 	settings->setDefault("abm_time_budget", "0.2");

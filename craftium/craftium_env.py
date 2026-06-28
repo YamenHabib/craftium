@@ -81,6 +81,7 @@ class CraftiumEnv(Env):
             gray_scale_keepdim: bool = False,
             seed: Optional[int] = None,
             sync_mode: bool = False,
+            fixed_sync_dtime: float = 0.0,
             fps_max: int = 200,
             pmul: int = 20,
             soft_reset: bool = False,
@@ -172,6 +173,7 @@ class CraftiumEnv(Env):
             frameskip=frameskip,
             rgb_frames=rgb_observations,
             sync_mode=sync_mode,
+            fixed_sync_dtime=fixed_sync_dtime,
             fps_max=fps_max,
             pmul=pmul,
         )
@@ -252,6 +254,8 @@ class CraftiumEnv(Env):
                 self.mt_chann.send([0]*21, 0, 0)  # nop action
         else:
             self.mt_chann.send_soft_reset()
+            self.mt_chann.receive()
+            self.mt_chann.send([0]*21, 0, 0)  # nop action after reset
 
         observation, voxobs, pos, vel, pitch, yaw, dtime, _reward, _term = self.mt_chann.receive()
         if not self.gray_scale_keepdim and not self.rgb_observations:

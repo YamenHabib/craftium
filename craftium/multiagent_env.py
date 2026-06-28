@@ -43,6 +43,7 @@ class MarlCraftiumEnv():
             gray_scale_keepdim: bool = False,
             seed: Optional[int] = None,
             sync_mode: bool = False,
+            fixed_sync_dtime: float = 0.0,
             fps_max: int = 200,
             pmul: int = 20,
     ):
@@ -100,6 +101,7 @@ class MarlCraftiumEnv():
             pipe_proc=pipe_proc,
             mt_server_port=mt_server_port,
             sync_mode=sync_mode,
+            fixed_sync_dtime=fixed_sync_dtime,
             fps_max=fps_max,
             pmul=pmul,
         )
@@ -123,6 +125,7 @@ class MarlCraftiumEnv():
                 frameskip=frameskip,
                 rgb_frames=rgb_observations,
                 sync_mode=sync_mode,
+                fixed_sync_dtime=fixed_sync_dtime,
                 fps_max=fps_max,
                 pmul=pmul,
             )
@@ -176,7 +179,10 @@ class MarlCraftiumEnv():
             for i in range(self.num_agents):
                 # send a soft reset to the MT client
                 self.mt_channs[i].send_soft_reset()
-                # receive a new observation from minetest
+                # consume the stale pre-reset observation, then return the
+                # first post-reset observation
+                self.mt_channs[i].receive()
+                self.mt_channs[i].send([0]*21, 0, 0)  # nop action after reset
                 observation, _voxobs, _pos, _vel, _pitch, _yaw, _dtime, reward, _term = self.mt_channs[i].receive()
                 if not self.gray_scale_keepdim and not self.rgb_observations:
                     observation = observation[:, :, 0]
